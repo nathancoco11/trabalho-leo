@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nathan - Nathan Superior Web</title>
+
+    <script>
+        (function () {
+            const isDark = localStorage.getItem('darkMode') === 'true';
+            if (isDark) document.documentElement.classList.add('dark-mode');
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (isLoggedIn) document.body.classList.add('logged-in');
+        })();
+    </script>
+
+    <style>
+        :root {
+            --neon-ciano: #0ff;
+            --neon-azul: #00f;
+            --neon-marinho: #0077be;
+            --vermelho: #ff6b6b;
+            --verde: #2ecc71;
+            --texto: #f0f0f0;
+            --fundo: #000;
+            --card: #0a0a0a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--fundo);
+            color: var(--texto);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Bolinhas neon */
+        .neon-circle {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.4;
+            filter: blur(10px);
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+            50% { transform: translate(-20px, 30px) scale(1.1); opacity: 0.5; }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(10, 10, 10, 0.95);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid var(--neon-ciano);
+            box-shadow: 0 0 10px var(--neon-ciano);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-shadow: 0 0 5px var(--neon-ciano);
+            flex: 1;
+            min-width: 0;
+        }
+
+        .logo span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .nav-icon {
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 6px;
+            text-shadow: 0 0 5px var(--neon-ciano);
+            text-decoration: none;
+        }
+
+        .user-info {
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--neon-ciano);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: black;
+            font-weight: bold;
+            font-size: 0.85rem;
+            box-shadow: 0 0 8px var(--neon-ciano);
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid var(--neon-ciano);
+            color: var(--neon-ciano);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        body.logged-in .user-info { display: flex; }
+        body.logged-in .login-btn-nav { display: none; }
+
+        /* Container principal */
+        .container {
+            padding: 20px 15px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Seção de perfil */
+        .profile-section {
+            background: rgba(10, 10, 10, 0.9);
+            border-radius: 15px;
+            padding: 25px 20px;
+            margin-bottom: 20px;
+            border: 2px solid var(--neon-ciano);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            text-align: center;
+        }
+
+        .profile-img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 4px solid var(--neon-ciano);
+            box-shadow: 0 0 20px var(--neon-ciano);
+        }
+
+        .profile-section h1 {
+            color: var(--neon-ciano);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 8px var(--neon-ciano);
+        }
+
+        /* Info cards */
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .info-card {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 12px 8px;
+            border-radius: 10px;
+            border: 1px solid var(--neon-ciano);
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+            text-align: center;
+        }
+
+        .info-card h4 {
+            color: var(--neon-ciano);
+            margin-bottom: 4px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px var(--neon-ciano);
+        }
+
+        .info-card p {
+            font-size: 0.9rem;
+            color: var(--texto);
+            font-weight: bold;
+        }
+
+        /* Bio */
+        .bio {
+            text-align: left;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .bio p {
+            margin-bottom: 12px;
+            opacity: 0.9;
+        }
+
+        /* Seção de amigos */
+        .friends-section {
+            background: rgba(10, 10, 10, 0.9);
+            border-radius: 15px;
+            padding: 25px 20px;
+            border: 2px solid var(--neon-ciano);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .friends-section h2 {
+            color: var(--neon-ciano);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            text-shadow: 0 0 8px var(--neon-ciano);
+        }
+
+        /* Grid de amigos - simplificado */
+        .friends-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .friend-card {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+            padding: 12px 8px;
+            border: 1px solid var(--neon-ciano);
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .friend-card:active {
+            transform: scale(0.95);
+        }
+
+        .friend-img {
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border: 2px solid var(--neon-ciano);
+            box-shadow: 0 0 10px var(--neon-ciano);
+        }
+
+        .friend-name {
+            color: var(--neon-ciano);
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 0 5px var(--neon-ciano);
+            line-height: 1.2;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--card);
+            margin: 15% auto;
+            padding: 25px 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 0 20px var(--neon-ciano);
+            position: relative;
+            border: 1px solid var(--neon-ciano);
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--vermelho);
+            background: none;
+            border: none;
+        }
+
+        .modal-title {
+            color: var(--neon-ciano);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+            text-shadow: 0 0 5px var(--neon-ciano);
+        }
+
+        .form-group { margin-bottom: 15px; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: var(--neon-ciano);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--neon-ciano);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            color: var(--texto);
+            -webkit-appearance: none;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 0 0 10px var(--neon-ciano);
+        }
+
+        .login-btn {
+            background: var(--neon-marinho);
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 5px;
+            box-shadow: 0 0 10px var(--neon-marinho);
+            font-weight: bold;
+        }
+
+        .switch-form {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .switch-btn {
+            background: none;
+            border: none;
+            color: var(--neon-ciano);
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.9rem;
+        }
+
+        .status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .success {
+            background: rgba(39, 174, 96, 0.2);
+            color: var(--verde);
+            border: 1px solid var(--verde);
+            display: block;
+        }
+
+        .error {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--vermelho);
+            border: 1px solid var(--vermelho);
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px 15px;
+            font-size: 0.75rem;
+            opacity: 0.6;
+            border-top: 1px solid #222;
+            margin-top: 20px;
+        }
+
+        /* Telas maiores */
+        @media (min-width: 600px) {
+            .profile-img { width: 180px; height: 180px; }
+            .profile-info { grid-template-columns: repeat(4, 1fr); }
+            .friend-img { width: 85px; height: 85px; }
+            .friend-name { font-size: 0.95rem; }
+        }
+
+        @media (min-width: 900px) {
+            .container { padding: 30px; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-moon" style="color: var(--neon-ciano);"></i>
+            <span>Nathan</span>
+        </div>
+        
+        <div class="nav-icons">
+            <a href="index.html" class="nav-icon" title="Início">
+                <i class="fas fa-home"></i>
+            </a>
+            <a href="personagens.html" class="nav-icon" title="Personagens">
+                <i class="fas fa-users"></i>
+            </a>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar"></div>
+                <button class="logout-btn" id="logoutBtn">Sair</button>
+            </div>
+            <button class="nav-icon login-btn-nav" id="loginBtnNav" title="Login">
+                <i class="fas fa-user"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <button class="close">&times;</button>
+            
+            <div id="loginForm">
+                <h2 class="modal-title">Entrar</h2>
+                
+                <form id="login">
+                    <div class="form-group">
+                        <label for="loginUsername"><i class="fas fa-user"></i> Usuário</label>
+                        <input type="text" id="loginUsername" placeholder="Seu nome de usuário" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword"><i class="fas fa-lock"></i> Senha</label>
+                        <input type="password" id="loginPassword" placeholder="Sua senha" required>
+                    </div>
+                    
+                    <button type="submit" class="login-btn"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+                    
+                    <div id="loginMessage" class="status-message"></div>
+                </form>
+                
+                <div class="switch-form">
+                    <span>Não tem conta? </span>
+                    <button class="switch-btn" id="showRegister">Registre-se</button>
+                </div>
+            </div>
+            
+            <div id="registerForm" style="display: none;">
+                <h2 class="modal-title">Criar Conta</h2>
+                
+                <form id="register">
+                    <div class="form-group">
+                        <label for="registerUsername"><i class="fas fa-user-edit"></i> Usuário</label>
+                        <input type="text" id="registerUsername" placeholder="Escolha um usuário" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerPassword"><i class="fas fa-key"></i> Senha</label>
+                        <input type="password" id="registerPassword" placeholder="Crie uma senha" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword"><i class="fas fa-check-circle"></i> Confirmar Senha</label>
+                        <input type="password" id="confirmPassword" placeholder="Repita a senha" required>
+                    </div>
+                    
+                    <button type="submit" class="login-btn"><i class="fas fa-user-plus"></i> Registrar</button>
+                    
+                    <div id="registerMessage" class="status-message"></div>
+                </form>
+                
+                <div class="switch-form">
+                    <span>Já tem conta? </span>
+                    <button class="switch-btn" id="showLogin">Faça login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Perfil -->
+        <div class="profile-section">
+            <img src="https://i.ibb.co/DPLQ31YD/Vbq-Flw-X1f-WL1-Rh-IKn1o0-Gpw-Ym-ZXKmtp-Y27-Nv-Lz-On9zy-WDV0e3-IX6-Ayl-ZYg-Xu-TJA5l-Ah3-VHP3-GQ-s160.jpg"
+                alt="Nathan" class="profile-img">
+            <h1>Nathan</h1>
+            
+            <div class="profile-info">
+                <div class="info-card">
+                    <h4>Idade</h4>
+                    <p>16 anos</p>
+                </div>
+                <div class="info-card">
+                    <h4>Gênero</h4>
+                    <p>Masculino</p>
+                </div>
+                <div class="info-card">
+                    <h4>Base</h4>
+                    <p>Alquimista</p>
+                </div>
+                <div class="info-card">
+                    <h4>Origem</h4>
+                    <p>Lunarianos</p>
+                </div>
+            </div>
+            
+            <div class="bio">
+                <p>Nathan é um garoto vesgo e divertido que sempre vai ajudar ou achar soluções para os problemas. Ele adora construir e guardar momentos com seus amigos, é muito doce e gentil com todos, mas guarda um passado muito doloroso que aqueles olhos vesgos e carisma escondem.</p>
+                <p>Nathan é o último do clã dos Lunarianos, um clã com propriedade e ligação direta com a lua. Ele sempre ajuda seus amigos e é muito querido por todos.</p>
+            </div>
+        </div>
+
+        <!-- Amigos -->
+        <div class="friends-section">
+            <h2>Amigos de Nathan</h2>
+
+            <div class="friends-grid">
+                <a href="flechera.html" class="friend-card">
+                    <img src="https://i.ibb.co/DfNwQbsc/image.png"
+                        alt="Flechera" class="friend-img">
+                    <span class="friend-name">Flechera</span>
+                </a>
+
+                <a href="snow.html" class="friend-card">
+                    <img src="https://i.ibb.co/b5rmST6b/Hc-g-Ukma-Hvseqc-LPdgy-OLx-Kw-LCo4-IK414e3e-Yu-X8-W2-Zhbam-L1-PFdvf7-Hfa-B9z-Cwq-M39b-HPs-Xc-s160-c.jpg"
+                        alt="Snow" class="friend-img">
+                    <span class="friend-name">Snow</span>
+                </a>
+
+                <a href="kenny.html" class="friend-card">
+                    <img src="https://i.ibb.co/6JWLn2nt/image.png"
+                        alt="Kenny" class="friend-img">
+                    <span class="friend-name">Kenny</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Site oficial de Nathan • Todos os direitos reservados</p>
+    </div>
+
+    <script>
+        const loginModal = document.getElementById('loginModal');
+        const loginBtnNav = document.getElementById('loginBtnNav');
+        const closeBtn = document.querySelector('.close');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginSubmit = document.getElementById('login');
+        const registerSubmit = document.getElementById('register');
+        const loginMessage = document.getElementById('loginMessage');
+        const registerMessage = document.getElementById('registerMessage');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userAvatar = document.getElementById('userAvatar');
+
+        function checkLoginStatus() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const username = localStorage.getItem('currentUser');
+            
+            if (isLoggedIn && username) {
+                document.body.classList.add('logged-in');
+                userAvatar.textContent = username.charAt(0).toUpperCase();
+            } else {
+                document.body.classList.remove('logged-in');
+            }
+        }
+
+        loginBtnNav.addEventListener('click', () => loginModal.style.display = 'block');
+        closeBtn.addEventListener('click', () => loginModal.style.display = 'none');
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) loginModal.style.display = 'none';
+        });
+
+        showRegister.addEventListener('click', () => {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        });
+        showLogin.addEventListener('click', () => {
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'block';
+        });
+
+        registerSubmit.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('registerUsername').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                showMessage(registerMessage, "As senhas não coincidem!", 'error');
+                return;
+            }
+            if (password.length < 4) {
+                showMessage(registerMessage, "A senha deve ter pelo menos 4 caracteres!", 'error');
+                return;
+            }
+
+            const usuarios = JSON.parse(localStorage.getItem('usuarios_magicos') || '[]');
+            if (usuarios.some(u => u.username === username)) {
+                showMessage(registerMessage, "Este usuário já existe!", 'error');
+                return;
+            }
+
+            usuarios.push({ username, password });
+            localStorage.setItem('usuarios_magicos', JSON.stringify(usuarios));
+            
+            showMessage(registerMessage, "Conta criada com sucesso!", 'success');
+            this.reset();
+            
+            setTimeout(() => {
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                registerMessage.style.display = 'none';
+            }, 1800);
+        });
+
+        loginSubmit.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            const usuarios = JSON.parse(localStorage.getItem('usuarios_magicos') || '[]');
+            const user = usuarios.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                showMessage(loginMessage, "Login bem-sucedido!", 'success');
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('currentUser', username);
+                
+                setTimeout(() => {
+                    loginModal.style.display = 'none';
+                    loginSubmit.reset();
+                    loginMessage.style.display = 'none';
+                    checkLoginStatus();
+                }, 1000);
+            } else {
+                showMessage(loginMessage, "Usuário ou senha incorretos!", 'error');
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            localStorage.setItem('isLoggedIn', 'false');
+            localStorage.removeItem('currentUser');
+            checkLoginStatus();
+        });
+
+        function showMessage(element, text, type) {
+            element.textContent = text;
+            element.className = `status-message ${type}`;
+        }
+
+        function createNeonCircles() {
+            const colors = ['#0ff', '#00f', '#0077be'];
+            document.querySelectorAll('.neon-circle').forEach(el => el.remove());
+            
+            for (let i = 0; i < 8; i++) {
+                const circle = document.createElement('div');
+                circle.classList.add('neon-circle');
+                const size = Math.random() * 60 + 20;
+                circle.style.width = `${size}px`;
+                circle.style.height = `${size}px`;
+                circle.style.left = `${Math.random() * 100}vw`;
+                circle.style.top = `${Math.random() * 100}vh`;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                circle.style.background = color;
+                circle.style.boxShadow = `0 0 15px ${color}`;
+                circle.style.animationDelay = `${Math.random() * 5}s`;
+                document.body.appendChild(circle);
+            }
+        }
+
+        window.addEventListener('load', createNeonCircles);
+        checkLoginStatus();
+    </script>
+</body>
+</html>

@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Leonidas - Capítulo 1 | Nathan Superior Web</title>
+
+    <script>
+        (function () {
+            const isDark = localStorage.getItem('darkMode') === 'true';
+            if (isDark) document.documentElement.classList.add('dark-mode');
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (isLoggedIn) document.body.classList.add('logged-in');
+        })();
+    </script>
+
+    <style>
+        :root {
+            --neon-ciano: #0ff;
+            --neon-azul: #00f;
+            --neon-marinho: #0077be;
+            --vermelho: #ff6b6b;
+            --verde: #2ecc71;
+            --amarelo: #f1c40f;
+            --roxo-lunar: #8e44ad;
+            --texto: #f0f0f0;
+            --fundo: #000;
+            --card: #0a0a0a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--fundo);
+            color: var(--texto);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Bolinhas neon */
+        .neon-circle {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.4;
+            filter: blur(10px);
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+            50% { transform: translate(-20px, 30px) scale(1.1); opacity: 0.5; }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(10, 10, 10, 0.95);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid var(--neon-ciano);
+            box-shadow: 0 0 10px var(--neon-ciano);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-shadow: 0 0 5px var(--neon-ciano);
+            flex: 1;
+            min-width: 0;
+        }
+
+        .logo span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .nav-icon {
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 6px;
+            text-shadow: 0 0 5px var(--neon-ciano);
+            text-decoration: none;
+        }
+
+        .user-info {
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--neon-ciano);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: black;
+            font-weight: bold;
+            font-size: 0.85rem;
+            box-shadow: 0 0 8px var(--neon-ciano);
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid var(--neon-ciano);
+            color: var(--neon-ciano);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        body.logged-in .user-info { display: flex; }
+        body.logged-in .login-btn-nav { display: none; }
+
+        /* Container */
+        .container {
+            padding: 20px 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Header do livro */
+        .book-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px 15px;
+            background: rgba(10, 10, 10, 0.9);
+            border-radius: 15px;
+            border: 2px solid var(--roxo-lunar);
+            box-shadow: 0 0 15px rgba(142, 68, 173, 0.4);
+        }
+
+        .book-title {
+            color: var(--roxo-lunar);
+            font-size: 1.8rem;
+            margin-bottom: 6px;
+            text-shadow: 0 0 10px var(--roxo-lunar);
+        }
+
+        .book-subtitle {
+            color: var(--verde);
+            font-size: 1rem;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .book-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .book-meta {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--neon-ciano);
+            text-align: center;
+        }
+
+        .book-meta h4 {
+            color: var(--neon-ciano);
+            margin-bottom: 2px;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .book-meta p {
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        /* Navegação de capítulos */
+        .chapter-nav {
+            background: rgba(10, 10, 10, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid var(--roxo-lunar);
+            box-shadow: 0 0 10px rgba(142, 68, 173, 0.3);
+        }
+
+        .chapter-nav h3 {
+            color: var(--roxo-lunar);
+            margin-bottom: 10px;
+            font-size: 1rem;
+            text-align: center;
+            text-shadow: 0 0 5px var(--roxo-lunar);
+        }
+
+        .chapter-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .chapter-item {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .chapter-item.active {
+            background: rgba(142, 68, 173, 0.3);
+            border: 1px solid var(--roxo-lunar);
+            box-shadow: 0 0 8px var(--roxo-lunar);
+        }
+
+        .chapter-item.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .chapter-link {
+            color: inherit;
+            text-decoration: none;
+            display: block;
+        }
+
+        /* Conteúdo da leitura */
+        .reading-content {
+            background: rgba(10, 10, 10, 0.9);
+            border-radius: 15px;
+            padding: 20px 15px;
+            border: 2px solid var(--roxo-lunar);
+            box-shadow: 0 0 15px rgba(142, 68, 173, 0.4);
+        }
+
+        .chapter-title {
+            color: var(--roxo-lunar);
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 8px var(--roxo-lunar);
+            border-bottom: 2px solid var(--roxo-lunar);
+            padding-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .story-content {
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .story-content p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .story-content .dialogue {
+            margin-left: 15px;
+            font-style: italic;
+            color: var(--verde);
+            border-left: 2px solid var(--verde);
+            padding-left: 12px;
+            margin-bottom: 12px;
+        }
+
+        .story-content .thought {
+            margin-left: 15px;
+            color: var(--neon-ciano);
+            font-style: italic;
+            margin-bottom: 12px;
+        }
+
+        .story-content .action {
+            margin-left: 0;
+            color: var(--amarelo);
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+
+        .story-content .divider {
+            text-align: center;
+            margin: 25px 0;
+            font-weight: bold;
+            color: var(--neon-ciano);
+            text-shadow: 0 0 5px var(--neon-ciano);
+            font-size: 1rem;
+        }
+
+        /* Mensagem "Por hoje é só" */
+        .end-message {
+            margin-top: 30px;
+            padding: 25px 20px;
+            background: linear-gradient(135deg, rgba(142, 68, 173, 0.15), rgba(0, 255, 255, 0.1));
+            border-radius: 15px;
+            border: 2px solid var(--neon-ciano);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .end-message::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 4s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -50%; }
+            100% { left: 150%; }
+        }
+
+        .end-message h3 {
+            color: var(--neon-ciano);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 8px var(--neon-ciano);
+            position: relative;
+            z-index: 1;
+        }
+
+        .end-message p {
+            font-size: 0.9rem;
+            color: var(--texto);
+            opacity: 0.9;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 8px;
+        }
+
+        .end-message .heart {
+            color: var(--vermelho);
+            font-size: 1.3rem;
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Controles de leitura */
+        .reading-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(142, 68, 173, 0.3);
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: var(--roxo-lunar);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-decoration: none;
+            flex: 1;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .nav-btn:active {
+            transform: scale(0.97);
+        }
+
+        .nav-btn.disabled {
+            background: #333;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--card);
+            margin: 15% auto;
+            padding: 25px 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 0 20px var(--neon-ciano);
+            position: relative;
+            border: 1px solid var(--neon-ciano);
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--vermelho);
+            background: none;
+            border: none;
+        }
+
+        .modal-title {
+            color: var(--neon-ciano);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+            text-shadow: 0 0 5px var(--neon-ciano);
+        }
+
+        .form-group { margin-bottom: 15px; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: var(--neon-ciano);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--neon-ciano);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            color: var(--texto);
+            -webkit-appearance: none;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 0 0 10px var(--neon-ciano);
+        }
+
+        .login-btn {
+            background: var(--neon-marinho);
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 5px;
+            box-shadow: 0 0 10px var(--neon-marinho);
+            font-weight: bold;
+        }
+
+        .switch-form {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .switch-btn {
+            background: none;
+            border: none;
+            color: var(--neon-ciano);
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.9rem;
+        }
+
+        .status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .success {
+            background: rgba(39, 174, 96, 0.2);
+            color: var(--verde);
+            border: 1px solid var(--verde);
+            display: block;
+        }
+
+        .error {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--vermelho);
+            border: 1px solid var(--vermelho);
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px 15px;
+            font-size: 0.75rem;
+            opacity: 0.6;
+            border-top: 1px solid #222;
+            margin-top: 20px;
+        }
+
+        /* Telas maiores */
+        @media (min-width: 600px) {
+            .book-info { grid-template-columns: repeat(4, 1fr); }
+            .book-title { font-size: 2.2rem; }
+            .book-subtitle { font-size: 1.2rem; }
+            .story-content { font-size: 1.05rem; }
+            .chapter-title { font-size: 1.6rem; }
+            .end-message h3 { font-size: 1.5rem; }
+            .end-message p { font-size: 1rem; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-book" style="color: var(--neon-ciano);"></i>
+            <span>Leonidas</span>
+        </div>
+        
+        <div class="nav-icons">
+            <a href="index.html" class="nav-icon" title="Início">
+                <i class="fas fa-home"></i>
+            </a>
+            <a href="livros.html" class="nav-icon" title="Livros">
+                <i class="fas fa-book-open"></i>
+            </a>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar"></div>
+                <button class="logout-btn" id="logoutBtn">Sair</button>
+            </div>
+            <button class="nav-icon login-btn-nav" id="loginBtnNav" title="Login">
+                <i class="fas fa-user"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <button class="close">&times;</button>
+            
+            <div id="loginForm">
+                <h2 class="modal-title">Entrar</h2>
+                
+                <form id="login">
+                    <div class="form-group">
+                        <label for="loginUsername"><i class="fas fa-user"></i> Usuário</label>
+                        <input type="text" id="loginUsername" placeholder="Seu nome de usuário" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword"><i class="fas fa-lock"></i> Senha</label>
+                        <input type="password" id="loginPassword" placeholder="Sua senha" required>
+                    </div>
+                    
+                    <button type="submit" class="login-btn"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+                    
+                    <div id="loginMessage" class="status-message"></div>
+                </form>
+                
+                <div class="switch-form">
+                    <span>Não tem conta? </span>
+                    <button class="switch-btn" id="showRegister">Registre-se</button>
+                </div>
+            </div>
+            
+            <div id="registerForm" style="display: none;">
+                <h2 class="modal-title">Criar Conta</h2>
+                
+                <form id="register">
+                    <div class="form-group">
+                        <label for="registerUsername"><i class="fas fa-user-edit"></i> Usuário</label>
+                        <input type="text" id="registerUsername" placeholder="Escolha um usuário" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerPassword"><i class="fas fa-key"></i> Senha</label>
+                        <input type="password" id="registerPassword" placeholder="Crie uma senha" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword"><i class="fas fa-check-circle"></i> Confirmar Senha</label>
+                        <input type="password" id="confirmPassword" placeholder="Repita a senha" required>
+                    </div>
+                    
+                    <button type="submit" class="login-btn"><i class="fas fa-user-plus"></i> Registrar</button>
+                    
+                    <div id="registerMessage" class="status-message"></div>
+                </form>
+                
+                <div class="switch-form">
+                    <span>Já tem conta? </span>
+                    <button class="switch-btn" id="showLogin">Faça login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header do livro -->
+        <div class="book-header">
+            <h1 class="book-title">Leonidas</h1>
+            <h2 class="book-subtitle">A Maldição Eterna</h2>
+            
+            <div class="book-info">
+                <div class="book-meta">
+                    <h4>Autor</h4>
+                    <p>Nathan</p>
+                </div>
+                <div class="book-meta">
+                    <h4>Gênero</h4>
+                    <p>Fantasia</p>
+                </div>
+                <div class="book-meta">
+                    <h4>Capítulos</h4>
+                    <p>1</p>
+                </div>
+                <div class="book-meta">
+                    <h4>Status</h4>
+                    <p>Em Andamento</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegação de capítulos -->
+        <div class="chapter-nav">
+            <h3><i class="fas fa-list"></i> Capítulos</h3>
+            <ul class="chapter-list">
+                <li class="chapter-item active">
+                    <a href="historiadoleon1.html" class="chapter-link">Capítulo 1: A Maldição Eterna</a>
+                </li>
+                <li class="chapter-item disabled">
+                    <span class="chapter-link">Capítulo 2: Em breve...</span>
+                </li>
+                <li class="chapter-item disabled">
+                    <span class="chapter-link">Capítulo 3: Em breve...</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Conteúdo da leitura -->
+        <div class="reading-content">
+            <h2 class="chapter-title">Capítulo 1: A Maldição Eterna</h2>
+            
+            <div class="story-content">
+                <p class="action">*Leonidas nasceu em uma vila de um clã chamado lunarianos, sendo o filho mais velho do capitão e da capitã do clã. O progenitor que seria o novo capitão do clã até seu irmão mais novo nascer com olhos verdes como esmeraldas. Bem, vamos ver como tudo isso começou.*</p>
+                
+                <p class="action">*3 horas da manhã em ponto, quando Leonidas entra no quarto após longas horas com sua mãe em trabalho de parto. Então Leonidas, de 4 anos, olha seu irmãozinho com um cabelo verde e olhos em cor de esmeralda — diferente dos da família, que eram roxos. Mas ele não se importou: segurou seu irmão olhando para ele com orgulho e feliz pelo seu irmão ser tão parecido com ele.*</p>
+                
+                <p class="dialogue">Leonidas — Ele é tão fofo...</p>
+                
+                <p class="dialogue">Mãe — Seu dever vai ser protegê-lo daqui para frente.</p>
+                
+                <p class="action">*A mãe de Leonidas sorria gentilmente ao ver seus filhos se dando bem minutos depois de se verem pela primeira vez...*</p>
+                
+                <p class="divider">✦ 6 Anos Depois ✦</p>
+                
+                <p class="action">*Vemos Leonidas emburrado andando pelas ruas da vila. Mesmo com 10 anos, por ser filho do capitão, todos esperavam que ele fosse forte — então desde cedo Leonidas se viu em uma cobrança extrema, e todos acabaram tendo receio de entrar em seu caminho. Pois com 9 anos ele derrubou um dos melhores guardas da vila com certa facilidade. E, andando, ele viu algumas garotas à frente cochichando sobre ele, e uma delas o chamou.*</p>
+                
+                <p class="dialogue">Garota — Ei, Leo! Por algum acaso está irritado por ninguém querer ser seu amigo?</p>
+                
+                <p class="action">*Leonidas fica confuso e mais emburrado, e continua andando por mais um tempo até que a garota corre até ele rindo.*</p>
+                
+                <p class="dialogue">Garota — Era piada!</p>
+                
+                <p class="action">*Ao escutar ela rindo, Leonidas para e vira-se. Ele vê que ela não parava de sorrir e rir, e isso fez algo no coração de Leonidas. E ele sorri de verdade para alguém depois de muito tempo.*</p>
+                
+                <p class="action">*Depois da garota se despedir dele, ele se senta em uma colina próxima, sorrindo, pensando e ficando feliz.*</p>
+                
+                <p class="thought">Leonidas — ✦ Ela sorriu para mim... Ela riu. Será que eu deveria melhorar para as pessoas me verem assim também? Ou melhoro para ela?... ✦</p>
+                
+                <p class="action">*Leonidas foi, aos poucos, se transformando. Sem perder sua habilidade afiada — pois continuava um dos melhores lutadores da guarda do clã —, aprendeu a dosar a força com um sorriso. Um carisma genuíno, que antes estava soterrado, começou a florescer.*</p>
+                
+                <p class="action">*E no centro dessa transformação estava Aurora.*</p>
+            </div>
+
+            <!-- Mensagem "Por hoje é só" -->
+            <div class="end-message">
+                <h3><i class="fas fa-moon"></i> Por hoje é só...</h3>
+                <p>A continuação dessa história fica para a próxima página.</p>
+                <p>Obrigado por ler até aqui! 🌙</p>
+                <i class="fas fa-heart heart"></i>
+            </div>
+
+            <!-- Controles -->
+            <div class="reading-controls">
+                <button class="nav-btn disabled" disabled>
+                    <i class="fas fa-arrow-left"></i> Anterior
+                </button>
+                <a href="historiadoleon2.html" class="nav-btn">
+                    Próxima <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Site oficial de Nathan • Todos os direitos reservados</p>
+    </div>
+
+    <script>
+        const loginModal = document.getElementById('loginModal');
+        const loginBtnNav = document.getElementById('loginBtnNav');
+        const closeBtn = document.querySelector('.close');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginSubmit = document.getElementById('login');
+        const registerSubmit = document.getElementById('register');
+        const loginMessage = document.getElementById('loginMessage');
+        const registerMessage = document.getElementById('registerMessage');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userAvatar = document.getElementById('userAvatar');
+
+        function checkLoginStatus() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const username = localStorage.getItem('currentUser');
+            
+            if (isLoggedIn && username) {
+                document.body.classList.add('logged-in');
+                userAvatar.textContent = username.charAt(0).toUpperCase();
+            } else {
+                document.body.classList.remove('logged-in');
+            }
+        }
+
+        loginBtnNav.addEventListener('click', () => loginModal.style.display = 'block');
+        closeBtn.addEventListener('click', () => loginModal.style.display = 'none');
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) loginModal.style.display = 'none';
+        });
+
+        showRegister.addEventListener('click', () => {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        });
+        showLogin.addEventListener('click', () => {
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'block';
+        });
+
+        registerSubmit.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('registerUsername').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                showMessage(registerMessage, "As senhas não coincidem!", 'error');
+                return;
+            }
+            if (password.length < 4) {
+                showMessage(registerMessage, "A senha deve ter pelo menos 4 caracteres!", 'error');
+                return;
+            }
+
+            const usuarios = JSON.parse(localStorage.getItem('usuarios_magicos') || '[]');
+            if (usuarios.some(u => u.username === username)) {
+                showMessage(registerMessage, "Este usuário já existe!", 'error');
+                return;
+            }
+
+            usuarios.push({ username, password });
+            localStorage.setItem('usuarios_magicos', JSON.stringify(usuarios));
+            
+            showMessage(registerMessage, "Conta criada com sucesso!", 'success');
+            this.reset();
+            
+            setTimeout(() => {
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                registerMessage.style.display = 'none';
+            }, 1800);
+        });
+
+        loginSubmit.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            const usuarios = JSON.parse(localStorage.getItem('usuarios_magicos') || '[]');
+            const user = usuarios.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                showMessage(loginMessage, "Login bem-sucedido!", 'success');
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('currentUser', username);
+                
+                setTimeout(() => {
+                    loginModal.style.display = 'none';
+                    loginSubmit.reset();
+                    loginMessage.style.display = 'none';
+                    checkLoginStatus();
+                }, 1000);
+            } else {
+                showMessage(loginMessage, "Usuário ou senha incorretos!", 'error');
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            localStorage.setItem('isLoggedIn', 'false');
+            localStorage.removeItem('currentUser');
+            checkLoginStatus();
+        });
+
+        function showMessage(element, text, type) {
+            element.textContent = text;
+            element.className = `status-message ${type}`;
+        }
+
+        function createNeonCircles() {
+            const colors = ['#0ff', '#00f', '#0077be', '#8e44ad'];
+            document.querySelectorAll('.neon-circle').forEach(el => el.remove());
+            
+            for (let i = 0; i < 8; i++) {
+                const circle = document.createElement('div');
+                circle.classList.add('neon-circle');
+                const size = Math.random() * 60 + 20;
+                circle.style.width = `${size}px`;
+                circle.style.height = `${size}px`;
+                circle.style.left = `${Math.random() * 100}vw`;
+                circle.style.top = `${Math.random() * 100}vh`;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                circle.style.background = color;
+                circle.style.boxShadow = `0 0 15px ${color}`;
+                circle.style.animationDelay = `${Math.random() * 5}s`;
+                document.body.appendChild(circle);
+            }
+        }
+
+        window.addEventListener('load', createNeonCircles);
+        checkLoginStatus();
+    </script>
+</body>
+</html>
